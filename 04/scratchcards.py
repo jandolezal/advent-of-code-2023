@@ -14,30 +14,11 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
 """
 
 
-def part1(input):
-    result = 0
-    for line in input.splitlines():
-        protocard, protowinning, protohave = re.split(r"[:|]", line)
-
-        card = int(protocard.split(" ")[-1])
-        winning = set(item for item in re.split(" ", protowinning) if item != "")
-        have = set(item for item in re.split(" ", protohave) if item != "")
-
-        n_matching = len(winning & have)  # number of matching numbers
-
-        if n_matching > 0:
-            score = 1 * 2 ** (n_matching - 1)
-            result += score
-
-    return result
-
-
 def parse_lines(input):
     cards = []
     for line in input.splitlines():
-        protocard, protowinning, protohave = re.split(r"[:|]", line)
+        _, protowinning, protohave = re.split(r"[:|]", line)
 
-        card = int(protocard.split(" ")[-1])
         winning = set(item for item in re.split(" ", protowinning) if item != "")
         have = set(item for item in re.split(" ", protohave) if item != "")
 
@@ -46,26 +27,38 @@ def parse_lines(input):
     return cards
 
 
+def part1(cards):
+    result = 0
+
+    for n_matching in cards:
+        if n_matching > 0:
+            score = 1 * 2 ** (n_matching - 1)
+            result += score
+
+    return result
+
+
 def part2(start=0, end=None):
     global counter
     global cards
 
     counter += len(cards[start:end])
 
-    for i, wins in enumerate(cards[start:end]):
-        if wins > 0:
-            part2(start + i + 1, start + i + 1 + wins)
+    for i, n_matching in enumerate(cards[start:end]):
+        if n_matching > 0:
+            part2(start + i + 1, start + i + 1 + n_matching)
 
 
 with open("04/input.txt") as f:
     input = f.read()
 
-
-test_result1 = part1(test_input1)
+test_cards = parse_lines(test_input1)
+test_result1 = part1(test_cards)
 assert (
     test_result1 == 13
 ), f"Result for test input in part 1 should be 13, not {test_result1}"
-result1 = part1(input)
+cards = parse_lines(input)
+result1 = part1(cards)
 print(result1)  # 23673
 
 counter = 0
