@@ -38,15 +38,17 @@ def part1(cards):
     return result
 
 
-def part2(start=0, end=None):
-    global counter
-    global cards
+def part2(cards, counter=0, start=0, end=None):
+    if set(cards[start:end]) == {0}:
+        return len(cards[start:end])
 
-    counter += len(cards[start:end])
+    total = len(cards[start:end])
 
     for i, n_matching in enumerate(cards[start:end]):
         if n_matching > 0:
-            part2(start + i + 1, start + i + 1 + n_matching)
+            total += part2(cards, counter, start + i + 1, start + i + 1 + n_matching)
+
+    return total
 
 
 with open("04/input.txt") as f:
@@ -61,11 +63,10 @@ cards = parse_lines(input)
 result1 = part1(cards)
 print(result1)  # 23673
 
-counter = 0
-cards = parse_lines(test_input1)
-test_result2 = part2()
-assert counter == 30, f"Result for test input in part 2 should be 30, not {counter}"
-counter = 0
-cards = parse_lines(input)
-result2 = part2()
-print(counter)  # not 3724672 but 12263631
+test_result2 = part2(test_cards)
+assert (
+    test_result2 == 30
+), f"Result for test input in part 2 should be 30, not {test_result2}"
+result2 = part2(cards)
+print(result2)  # not 3_724_672 but 12_263_631
+assert result2 == 12_263_631, f"Result {result2} is wrong"
