@@ -3,6 +3,8 @@
 https://adventofcode.com/2023/day/8
 """
 
+from math import lcm
+
 test_input1 = """RL
 
 AAA = (BBB, CCC)
@@ -12,6 +14,18 @@ DDD = (DDD, DDD)
 EEE = (EEE, EEE)
 GGG = (GGG, GGG)
 ZZZ = (ZZZ, ZZZ)
+"""
+
+test_input2 = """LR
+
+11A = (11B, XXX)
+11B = (XXX, 11Z)
+11Z = (11B, XXX)
+22A = (22B, XXX)
+22B = (22C, 22C)
+22C = (22Z, 22Z)
+22Z = (22B, 22B)
+XXX = (XXX, XXX)
 """
 
 
@@ -43,7 +57,7 @@ def part1(instructions, data):
     instructions_generator = repeating_string_generator(instructions)
 
     for direction in instructions_generator:
-        print(steps, position)
+        # print(steps, position)
 
         if direction == "L":
             position = data[position][0]
@@ -61,9 +75,42 @@ def part1(instructions, data):
     return
 
 
+def part2(instructions, data):
+    steps = 0
+
+    positions = [node for node in data.keys() if node.endswith("A")]
+    # lowest step single ghost reached a node ending with Z
+    lowest = [None for i in range(len(positions))]
+
+    instructions_generator = repeating_string_generator(instructions)
+
+    for direction in instructions_generator:
+        if direction == "L":
+            for i, position in enumerate(positions):
+                positions[i] = data[position][0]
+
+        elif direction == "R":
+            for i, position in enumerate(positions):
+                positions[i] = data[position][1]
+        else:
+            print("waddup?!")
+            raise SystemExit
+
+        steps += 1
+
+        for i, position in enumerate(positions):
+            if position.endswith("Z"):
+                lowest[i] = steps
+
+        if all(lowest):
+            return lcm(*lowest)  # was lost. not my idea. saw it used on reddit
+    return
+
+
 with open("08/input.txt") as f:
     input = f.read()
 
+# part 1
 test_instructions1, test_data1 = prepare_data(test_input1)
 test_result1 = part1(test_instructions1, test_data1)
 assert test_result1 == 2, f"Test result in part 1 should be 2, not {test_result1}"
@@ -71,3 +118,13 @@ assert test_result1 == 2, f"Test result in part 1 should be 2, not {test_result1
 instructions1, data1 = prepare_data(input)
 result1 = part1(instructions1, data1)
 print(result1)  # 18023
+
+
+# part 2
+test_instructions2, test_data2 = prepare_data(test_input2)
+test_result2 = part2(test_instructions2, test_data2)
+assert test_result2 == 6, f"Test result in part 2 should be 6, not {test_result2}"
+
+# data is the same
+result2 = part2(instructions1, data1)
+print(result2)  # 14449445933179
