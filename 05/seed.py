@@ -62,8 +62,6 @@ def _translate(source, destination):
 
 
 def part1(data):
-    # seed_to_soil = _translate(data["seeds"], data["seed-to-soil"])
-    # soil_to_fertilizer = _translate(seed_to_soil.values(), data["soil-to-fertilizer"])
     seeds = data["seeds"]
     data_wo_seeds = data.copy()
     data_wo_seeds.pop("seeds")
@@ -79,6 +77,35 @@ def part1(data):
     return min(result["humidity-to-location"].values())
 
 
+def part2(data, start=0, end=100):
+    """Brute force solution starting from location and looking for corresponding seed."""
+    location = start
+    while location < end:
+        if location % 1_000_000 == 0:
+            print(location)
+        target = location
+        for mapping in list(data.keys())[::-1]:
+            if mapping != "seeds":
+                for row in data[mapping]:
+                    if row[0] <= target < row[0] + row[2]:
+                        target = target + row[1] - row[0]
+                        break
+                if (mapping == "seed-to-soil") and any(
+                    [
+                        data["seeds"][i]
+                        <= target
+                        < data["seeds"][i] + data["seeds"][i + 1]
+                        for i in range(0, len(data["seeds"]), 2)
+                    ]
+                ):
+                    print("lowest location: ", location, "target: ", target)
+                    return location
+
+        location += 1
+
+    return
+
+
 with open("05/input.txt") as f:
     input = f.read()
 
@@ -89,3 +116,9 @@ assert test_result1 == 35, f"Test result in part 1 should be 35, not {test_resul
 data1 = prepare_data(input)
 result1 = part1(data1)
 print(result1)  # 389056265
+
+
+test_result2 = part2(test_data1)
+assert test_result2 == 46, f"Test result in part 2 should be 46, not {test_result2}"
+result2 = part2(data1, start=0, end=800_000_000)
+print(result2)  # 137516820
