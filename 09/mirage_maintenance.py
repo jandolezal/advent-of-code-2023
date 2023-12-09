@@ -23,7 +23,7 @@ def _calculate_increment(row):
             return list(accumulate(diffs))[-1]
         else:
             row = [second - first for first, second in zip(row, row[1:])]
-        
+
         diffs.append(row[-1])
 
 
@@ -32,24 +32,6 @@ def part1(data):
     for row in data:
         predicted.append(row[-1] + _calculate_increment(row))
 
-    return sum(predicted)
-
-
-def _calculate_increment2(row):
-    diffs = []
-
-    while True:
-        if set(row) == {0}:
-            return list(accumulate(diffs[::-1], func=lambda f, s: s - f))[-1]
-        else:
-            row = [second - first for first, second in zip(row, row[1:])]
-        diffs.append(row[0])
-
-
-def part2(data):
-    predicted = []
-    for row in data:
-        predicted.append(row[0] - _calculate_increment2(row))
     return sum(predicted)
 
 
@@ -67,9 +49,10 @@ print(result1)  # 1930746032
 
 
 # part 2
-test_data2 = prepare_data(test_input1)
-test_result2 = part2(test_data2)
+test_data2 = [row[::-1] for row in test_data1]
+test_result2 = part1(test_data2)
 assert test_result2 == 2, f"Test result in part 2 should be 2, not {test_result2}"
 
-result2 = part2(data1)
+data2 = [row[::-1] for row in data1]
+result2 = part1(data2)
 print(result2)  # 1154
